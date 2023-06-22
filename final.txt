@@ -1,0 +1,59 @@
+#include <Key.h>
+#include <Keypad.h>
+#include <Servo.h>
+
+Servo servo;
+const byte Rows=4;
+const byte Cols=4;
+byte rowpins[Rows] = {12,10,9,8};
+byte colpins[Cols] = {7,6,5,4};
+char buttons[Rows][Cols] = {
+  {'1','2','3','A'},
+  {'4','5','6','B'},
+  {'7','8','9','C'},
+  {'*','0','#','D'}
+};
+Keypad key1= Keypad(makeKeymap(buttons),rowpins,colpins,Rows,Cols);
+String unlock = "852914";
+String password = "";
+bool islocked = true;
+int greenled = 13;
+
+void setup() {
+  Serial.begin(9600);
+  servo.attach(11);
+  pinMode(greenled,OUTPUT);
+
+}
+
+void loop() {
+   for(int i = 0;i<6;i++){
+     char key = key1.waitForKey();
+     password += key;
+     Serial.println(password);
+   }
+  
+   checkpassword();
+   password = "";
+   delay(500); 
+
+}
+void checkpassword(){
+   if(unlock == password){
+     islocked = false;
+     //servo.write(90);
+     //delay(500);
+     for(int j = 0; j <= 180;j++){
+        servo.write(j);
+        delay(15);
+        digitalWrite(greenled,HIGH);
+      }
+      
+      for(int j = 180; j >=0;j--){
+        servo.write(j);
+        delay(15);
+         digitalWrite(greenled,LOW);
+      }
+    
+   }
+}
